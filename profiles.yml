@@ -1,0 +1,11 @@
+jaffle_warehouse:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DBT_DUCKDB_PATH', 'jaffle.duckdb') }}"
+      threads: 4
+    ci:
+      type: duckdb
+      path: ":memory:"
+      threads: 2

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dbt-local-warehouse"
+version = "0.1.0"
+description = "End-to-end dbt project on DuckDB demonstrating analytics engineering: staging/intermediate/marts, tests, snapshots, macros, and dbt docs."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Wassim Fayala", email = "wassimfayala2@gmail.com" }]
+requires-python = ">=3.11"
+
+dependencies = [
+    "dbt-core>=1.9.0",
+    "dbt-duckdb>=1.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=4.0.0",
+    "detect-secrets>=1.5.0",
+    "sqlfluff>=3.2.0",
+    "sqlfluff-templater-dbt>=3.2.0",
+]
+
+[tool.hatch.build.targets.wheel]
+bypass-selection = true

@@ -1,0 +1,24 @@
+[sqlfluff]
+dialect = duckdb
+templater = dbt
+exclude_rules = L011,L014,L016,L022,L030,L034,L036,L042,L044
+max_line_length = 120
+
+[sqlfluff:indentation]
+indent_unit = space
+tab_space_size = 2
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = lower
+
+[sqlfluff:templater:dbt]
+project_dir = .
+profiles_dir = .
+profile = jaffle_warehouse
+target = ci
