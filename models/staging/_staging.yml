@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "Cleaned customer rows: lowercased email, derived `full_name`."
+    columns:
+      - name: customer_id
+        description: "Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: email
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: '^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+      - name: signup_date
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "'2020-01-01'"
+              max_value: "current_date"
+              row_condition: "signup_date is not null"
+              strictly: false
+
+  - name: stg_orders
+    description: "Cleaned order rows. `is_fulfilled` and `is_returned` precomputed for downstream filters."
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['placed', 'shipped', 'completed', 'returned', 'return_pending']
+      - name: is_fulfilled
+        tests:
+          - not_null
+
+  - name: stg_payments
+    description: "Cleaned payment rows with the canonical EUR amount derived via cents_to_euros macro."
+    columns:
+      - name: payment_id
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: amount_cents
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+      - name: amount_eur
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
+              strictly: false

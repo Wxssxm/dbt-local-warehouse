@@ -1,0 +1,59 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Seed CSVs ingested as the simulated raw layer of a Jaffle Shop replica."
+    schema: raw
+    tables:
+      - name: raw_customers
+        description: "One row per registered customer."
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: email
+            tests:
+              - not_null
+          - name: signup_date
+            tests:
+              - not_null
+
+      - name: raw_orders
+        description: "One row per order placed by a customer."
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            tests:
+              - not_null
+              - relationships:
+                  to: source('raw', 'raw_customers')
+                  field: id
+          - name: status
+            tests:
+              - accepted_values:
+                  values: ['placed', 'shipped', 'completed', 'returned', 'return_pending']
+
+      - name: raw_payments
+        description: "One row per payment attached to an order. Amounts are in cents."
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: order_id
+            tests:
+              - not_null
+              - relationships:
+                  to: source('raw', 'raw_orders')
+                  field: id
+          - name: payment_method
+            tests:
+              - accepted_values:
+                  values: ['credit_card', 'coupon', 'bank_transfer', 'gift_card']
+          - name: amount_cents
+            tests:
+              - not_null
