@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: fct_orders
+    description: "Order grain: one row per order, with summed payment amount and pattern."
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: payment_pattern
+        tests:
+          - accepted_values:
+              values: ['unpaid', 'single_payment', 'split_payment']
+      - name: total_amount_eur
+        tests:
+          - not_null
+
+  - name: fct_payments
+    description: "Payment grain: one row per payment, joined back to its order."
+    columns:
+      - name: payment_id
+        tests:
+          - unique
+          - not_null
+      - name: amount_eur
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000

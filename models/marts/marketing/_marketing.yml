@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "One row per customer with lifetime metrics + a derived segment."
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_segment
+        tests:
+          - accepted_values:
+              values: ['never_ordered', 'one_time', 'occasional', 'repeat']
+      - name: lifetime_revenue_eur
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+  - name: customer_cohorts
+    description: "Customers grouped by signup month with cohort-level aggregates."
+    columns:
+      - name: cohort_month
+        tests:
+          - unique
+          - not_null
+      - name: customers_in_cohort
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 1"

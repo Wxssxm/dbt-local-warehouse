@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: int_orders_with_payments
+    description: "Orders enriched with the sum of their payment amounts and a payment count."
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+      - name: total_amount_eur
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+  - name: int_customer_lifetime
+    description: "One row per customer with lifetime activity metrics."
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: orders_count
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 1"
